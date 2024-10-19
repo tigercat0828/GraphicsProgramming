@@ -6,9 +6,10 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
+#include <glm/glm.hpp>
 class Shader {
 public:
-	unsigned int ID;
+	GLuint ID;
 	std::string Name;
 	Shader(const char* vsFile, const char* fsFile) {
 		// 獲取當前工作目錄並定位到 Assets 資料夾
@@ -75,14 +76,33 @@ public:
 	void Use() {
 		glUseProgram(ID);
 	}
-	void SetBool(const std::string& name, bool value) const {
-		glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+	void SetBool(const char* name, bool value) const {
+		glUniform1i(glGetUniformLocation(ID, name), value);
 	}
-	void SetInt(const std::string& name, int value) const {
-		glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+	void SetInt(const char* name, int value) const {
+		glUniform1i(glGetUniformLocation(ID, name), value);
 	}
-	void SetFloat(const std::string& name, float value) const {
-		glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+	void SetFloat(const char* name, float value) const {
+		glUniform1f(glGetUniformLocation(ID, name), value);
+	}
+	void SetVec2(const char* name, const glm::vec2 vec) const {
+		unsigned int uniLoc = glGetUniformLocation(ID, name);
+		glUniform2fv(uniLoc, 1, &vec[0]);
+	}
+	void SetVec3(const char* name, const glm::vec3 vec) const {
+		unsigned int uniLoc = glGetUniformLocation(ID, name);
+		glUniform3fv(uniLoc, 1, &vec[0]);
+	}
+	void SetVec4(const char* name, const glm::vec4 vec) const {
+		unsigned int uniLoc = glGetUniformLocation(ID, name);
+		glUniform4fv(uniLoc, 1, &vec[0]);
+	}
+	void SetMat4(const char* name,const glm::mat4 &mat) const {
+		unsigned int uniLoc = glGetUniformLocation(ID, name);
+		glUniformMatrix4fv(uniLoc, 1, GL_FALSE, &mat[0][0]);
+	}
+	void Delete() const {
+		glDeleteProgram(ID);
 	}
 private:
 	void CheckError(unsigned int ID, const std::string& type) {

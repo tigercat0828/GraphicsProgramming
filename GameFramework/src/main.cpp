@@ -8,9 +8,18 @@
 #include <spdlog/spdlog.h>
 #include "Shader.h"
 #include "Texture.h"
-#include <filesystem>
+#include "VAO.h"
+#include "VBO.h"
+#include "EBO.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 using namespace std;
+using namespace glm;
 
+
+int WindowWidth = 800;
+int WindowHeight = 600;
 int InitSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		spdlog::error("Fail to init SDL : {}", SDL_GetError());
@@ -38,7 +47,7 @@ int main(int argc, char** argv) {
 	SDL_Window* window = SDL_CreateWindow(
 		"LearnOpenGL",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		800, 600,
+		WindowWidth, WindowHeight,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 	if (!window) {
 		spdlog::error("Fail to create SDL window");
@@ -81,26 +90,17 @@ int main(int argc, char** argv) {
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
 	};
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	VAO vao;
+	vao.Bind();
+	VBO vbo(vertices,sizeof(vertices), GL_STATIC_DRAW);
+	EBO ebo(indices,sizeof(indices), GL_STATIC_DRAW);
+	vao.AttribPointer(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+	vao.AttribPointer(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	vao.AttribPointer(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	vao.UnBind();
+	vbo.UnBind();
+	ebo.UnBind();
 
 
 	Shader shader("Basic.vert", "Basic.frag");
@@ -109,12 +109,16 @@ int main(int argc, char** argv) {
 	Texture texture1("wall.jpg");
 	Texture texture2("awesomeface.png");
 	
+	shader.Use();
+	texture1.AssignUnit(shader, "texture1", 0);
+	texture2.AssignUnit(shader, "texture2", 1);
 
 
-	glEnable(GL_BLEND);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, WindowWidth, WindowHeight);
 	bool isRunning = true;
+
+
 	while (isRunning) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
@@ -129,17 +133,27 @@ int main(int argc, char** argv) {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		mat4 modelMat = mat4(1.0);
+		mat4 viewMat = mat4(1.0);
+		mat4 projMat = mat4(1.0);
+
+		modelMat = glm::rotate(modelMat, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
+		projMat = glm::perspective(glm::radians(45.0f), WindowWidth / (float)WindowHeight, 0.1f, 100.0f);
 
 
-
-		float timeValue = SDL_GetTicks()/1000.0;
-		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		glBindVertexArray(VAO);
 		shader.Use();
-		shader.SetFloat("green", greenValue);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture2.ID);
+		shader.SetMat4("modelMat", modelMat);
+		shader.SetMat4("viewMat", viewMat);
+		shader.SetMat4("projMat", projMat);
 
+		glActiveTexture(GL_TEXTURE0);
+		texture1.Bind();
+		glActiveTexture(GL_TEXTURE1);
+		texture2.Bind();
+		
+		vao.Bind();
+		shader.Use();
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		
 
@@ -147,9 +161,10 @@ int main(int argc, char** argv) {
 	}
 
 	// clean up
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	vao.Delete();
+	vbo.Delete();
+	ebo.Delete();
+	shader.Delete();
 
 	SDL_GL_DeleteContext(GLcontext);
 	SDL_DestroyWindow(window);
