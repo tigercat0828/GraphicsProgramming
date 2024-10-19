@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\glad\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\imgui\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\imgui\imgui_impl_sdl2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\imgui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\imgui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Repository\GraphicsProgramming\OpenGLTemplate\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{143C33C3-12CC-30A0-ADB6-7C4EF0B9861A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

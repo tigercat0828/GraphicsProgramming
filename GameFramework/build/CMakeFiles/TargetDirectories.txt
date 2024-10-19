@@ -1,0 +1,3 @@
+C:/Repository/GraphicsProgramming/GameFramework/build/CMakeFiles/main.dir
+C:/Repository/GraphicsProgramming/GameFramework/build/CMakeFiles/ALL_BUILD.dir
+C:/Repository/GraphicsProgramming/GameFramework/build/CMakeFiles/ZERO_CHECK.dir
