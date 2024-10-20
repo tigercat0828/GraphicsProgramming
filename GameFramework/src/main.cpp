@@ -6,20 +6,30 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
 #include <spdlog/spdlog.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "Shader.h"
 #include "Texture.h"
 #include "VAO.h"
 #include "VBO.h"
 #include "EBO.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "Camera.h"
+#include "Window.h"
 using namespace std;
 using namespace glm;
 
 
 int WindowWidth = 800;
 int WindowHeight = 600;
+
+
+float DeltaTime = 0.0f;
+float LastFrame = 0.0f;
+
+Camera camera(vec3(0, 0, -3),0,-90);
+bool isRunning = true;
+
 int InitSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		spdlog::error("Fail to init SDL : {}", SDL_GetError());
@@ -40,16 +50,75 @@ void PrintInfo() {
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	spdlog::info("Maximum nr of vertex attributes supported : {}", nrAttributes);
 }
+void processKeyboardInput(const Uint8* state, float deltaTime) {
+	if (state[SDL_SCANCODE_W]) {
+		camera.Move(FORWARD, deltaTime);
+	}
+	if (state[SDL_SCANCODE_S]) {
+		camera.Move(BACKWARD, deltaTime);
+	}
+	if (state[SDL_SCANCODE_A]) {
+		camera.Move(LEFT, deltaTime);
+	}
+	if (state[SDL_SCANCODE_D]) {
+		camera.Move(RIGHT, deltaTime);
+	}
+	if (state[SDL_SCANCODE_LSHIFT]) {
+		camera.Move(DOWN, deltaTime);
+	}
+	if (state[SDL_SCANCODE_SPACE]) {
+		camera.Move(UP, deltaTime);
+	}
+}
+
+void processMouseInput(SDL_Event& event) {
+
+	if (event.type == SDL_MOUSEMOTION) {
+		float mx = event.motion.xrel;
+		float my = event.motion.yrel;
+		camera.Turn(mx, -my);
+	}
+}
+
+void ProcessInput(SDL_Window* window, float deltaTime) {
+	SDL_Event event;
+	const Uint8* state = SDL_GetKeyboardState(NULL);
+
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT) {
+			SDL_DestroyWindow(window);
+			SDL_Quit();
+			exit(0);
+		}
+		else if (event.type == SDL_KEYDOWN) {
+			// 可以在這裡添加其他鍵盤事件處理
+			if (event.key.keysym.sym == SDLK_ESCAPE) {
+				isRunning = false;
+			}
+		}
+		processMouseInput(event);
+	}
+	processKeyboardInput(state, deltaTime);
+}
+
+
+
+Window mainWin;
 int main(int argc, char** argv) {
+
+	
 	InitSDL();
 	stbi_set_flip_vertically_on_load(true);
 	// window creation
-	SDL_Window* window = SDL_CreateWindow(
-		"LearnOpenGL",
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		WindowWidth, WindowHeight,
-		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-	if (!window) {
+	
+	// craete OpenGL context and make it current
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+	mainWin = Window("LearnOpenGL", 800, 600);
+	
+	if (!mainWin.Instance) {
 		spdlog::error("Fail to create SDL window");
 		SDL_Quit();
 		return -1;
@@ -57,12 +126,8 @@ int main(int argc, char** argv) {
 	else {
 		spdlog::info("Success to create SDL window");
 	}
-	// craete OpenGL context and make it current
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-	SDL_GLContext GLcontext = SDL_GL_CreateContext(window);
+	
+	SDL_GLContext GLcontext = SDL_GL_CreateContext(mainWin.Instance);
 	if (!GLcontext) {
 		spdlog::error("Fail to create OpenGL context");
 		return -1;
@@ -73,7 +138,7 @@ int main(int argc, char** argv) {
 	if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
 		spdlog::error("Fail to init GLAD");
 		SDL_GL_DeleteContext(GLcontext);
-		SDL_DestroyWindow(window);
+		SDL_DestroyWindow(mainWin.Instance);
 		SDL_Quit();
 		return -1;
 	}
@@ -146,8 +211,6 @@ int main(int argc, char** argv) {
 	vao.UnBind();
 	vbo.UnBind();
 
-
-
 	Shader shader("Basic.vert", "Basic.frag");
 	
 
@@ -159,21 +222,18 @@ int main(int argc, char** argv) {
 	texture2.AssignUnit(shader, "texture2", 1);
 
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glViewport(0, 0, WindowWidth, WindowHeight);
-	bool isRunning = true;
-
+	
+	SDL_WarpMouseInWindow(mainWin.Instance, mainWin.Width, mainWin.Height);
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	while (isRunning) {
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_QUIT) isRunning = false;
-			if (event.type == SDL_KEYDOWN) {
-				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
-					isRunning = false;
-				}
-			}
-		}
+		float currentFrame = SDL_GetTicks() / 1000.0f;
+		DeltaTime = currentFrame - LastFrame;
+		LastFrame = currentFrame;
+
+		ProcessInput(mainWin.Instance, DeltaTime);
+
 		// render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -182,23 +242,17 @@ int main(int argc, char** argv) {
 		mat4 viewMat = mat4(1.0);
 		mat4 projMat = mat4(1.0);
 
-		modelMat =  glm::rotate(modelMat, (float)(SDL_GetTicks()/1000.0f)* glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
-		projMat = glm::perspective(glm::radians(45.0f), WindowWidth / (float)WindowHeight, 0.1f, 100.0f);
-
-
 		shader.Use();
-		//shader.SetMat4("modelMat", modelMat);
-		shader.SetMat4("viewMat", viewMat);
-		shader.SetMat4("projMat", projMat);
-
 		glActiveTexture(GL_TEXTURE0);
 		texture1.Bind();
 		glActiveTexture(GL_TEXTURE1);
 		texture2.Bind();
-		
+		viewMat = camera.GetViewMatrix();
+		projMat = camera.GetProjMatrix(WindowWidth, WindowHeight);
+		shader.SetMat4("viewMat", viewMat);
+		shader.SetMat4("projMat", projMat);
+
 		vao.Bind();
-	
 		for (unsigned int i = 0; i < 10; i++) {
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
@@ -209,8 +263,8 @@ int main(int argc, char** argv) {
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		
-
-		SDL_GL_SwapWindow(window);
+		
+		SDL_GL_SwapWindow(mainWin.Instance);
 	}
 
 	// clean up
@@ -219,7 +273,7 @@ int main(int argc, char** argv) {
 	shader.Delete();
 
 	SDL_GL_DeleteContext(GLcontext);
-	SDL_DestroyWindow(window);
+	SDL_DestroyWindow(mainWin.Instance);
 	SDL_Quit();
 	return 0;
 
