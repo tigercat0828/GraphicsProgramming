@@ -398,6 +398,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Cmake build
-/build
-/bin
-/out
+build/
+bin/
+out/

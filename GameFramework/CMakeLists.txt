@@ -17,7 +17,7 @@ include_directories(include/imgui)
 
 
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c")
-add_executable(${EXECUTABLE_NAME} ${SOURCES} "src/Shader.h" "src/stb_image.h" "src/Texture.h" "src/VAO.h" "src/VBO.h" "src/EBO.h")
+add_executable(${EXECUTABLE_NAME} ${SOURCES} "src/Shader.h" "src/stb_image.h" "src/Texture.h" "src/VAO.h" "src/VBO.h" "src/EBO.h" "src/Camera.h")
 
 # config spdlog
 set(spdlog_DIR "${CMAKE_SOURCE_DIR}/Library/spdlog")
