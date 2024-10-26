@@ -5,7 +5,7 @@
 
 
 using WindowResizeFunc = void(*)(int width, int height);
-using KeyDownFunc = void(*)(SDL_Keysym keysym);
+using KeyDownFunc = void(*)(SDL_Keycode keycode);
 using MouseWheelFunc = void(*)(float wheelY);
 using MouseButtonFunc = void(*)();
 

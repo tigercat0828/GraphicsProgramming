@@ -13,18 +13,21 @@ static void OnResize(int width, int height) {
 	GL_CALL(glViewport(0, 0, width, height));
 	spdlog::info("Resize {} {}", width, height);
 }
-static void OnKeyDown(SDL_Keysym keysym) {
-	if (keysym.sym == SDLK_ESCAPE) {
+static void OnKeyDown(SDL_Keycode keycode) {
+
+	const char* keyName = SDL_GetKeyName(keycode);
+	spdlog::info("Key {} pressed down", keyName);
+	if (keycode == SDLK_ESCAPE) {
 		spdlog::info("window close");
 		APP->Close();
 	}
 }
 static void OnMouseWheel(float wheelY) {
 	if (wheelY > 0) {
-		std::cout << "向上滾動" << std::endl;
+		spdlog::info("wheel up");
 	}
 	else if (wheelY < 0) {
-		std::cout << "向下滾動" << std::endl;
+		spdlog::info("wheel down");
 	}
 }
 int main(int argc, char** argv) {

@@ -93,7 +93,7 @@ void Application::ProcessInput() {
 		// key down
 		if (event.type == SDL_EventType::SDL_KEYDOWN) {
 			if (mKeyDownFunc != nullptr) {
-				mKeyDownFunc(event.key.keysym);
+				mKeyDownFunc(event.key.keysym.sym);
 			}
 		}
 		if (event.type == SDL_EventType::SDL_MOUSEBUTTONDOWN) {
