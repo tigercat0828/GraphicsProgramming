@@ -36,7 +36,7 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 	mWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWidth, mHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |SDL_WINDOW_RESIZABLE);
 
 	if (mWindow == NULL) {
-		spdlog::error("Fail to create SDL window");
+		spdlog::error("Fail to create SDL window : {}", SDL_GetError());
 		SDL_Quit();
 		return false;
 	}
@@ -89,24 +89,26 @@ void Application::ProcessInput() {
 	SDL_Event event;
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_QUIT) {
-			SDL_DestroyWindow(mWindow);
-			SDL_Quit();
-			exit(-3);
-		}
+
 		// key down
-		if (event.type == SDL_KEYDOWN) {
+		if (event.type == SDL_EventType::SDL_KEYDOWN) {
 			if (mKeyDownFunc != nullptr) {
 				mKeyDownFunc(event.key.keysym);
 			}
+		}
+		if (event.type == SDL_EventType::SDL_MOUSEBUTTONDOWN) {
+			
+		}
+		if (event.type == SDL_EventType::SDL_MOUSEMOTION) {
+
 		}
 		if (event.type == SDL_EventType::SDL_MOUSEWHEEL) {
 			if (mMouseWheel != nullptr) {
 				mMouseWheel(event.wheel.y);
 			}
-		
 		}
-		if (event.type == SDL_WINDOWEVENT) {
+		
+		if (event.type == SDL_EventType::SDL_WINDOWEVENT) {
 			//window resize 
 			if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 				if (mWindowResizeFunc != nullptr) {
@@ -115,6 +117,10 @@ void Application::ProcessInput() {
 					mWindowResizeFunc(width, height);
 				}
 			}
+		}
+		else if (event.type == SDL_QUIT) {
+			SDL_DestroyWindow(mWindow);
+			SDL_Quit();
 		}
 		//processMouseInput(event);
 	}

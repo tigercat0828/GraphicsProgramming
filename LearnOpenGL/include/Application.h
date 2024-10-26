@@ -7,7 +7,7 @@
 using WindowResizeFunc = void(*)(int width, int height);
 using KeyDownFunc = void(*)(SDL_Keysym keysym);
 using MouseWheelFunc = void(*)(float wheelY);
-
+using MouseButtonFunc = void(*)();
 
 class Application {
 	 
@@ -40,6 +40,7 @@ public:
 	void SetWindowResizeFunc(WindowResizeFunc func);
 	void SetKeyDownFunc(KeyDownFunc func);
 	void SetMouseWheelFunc(MouseWheelFunc func);
+	void SetMouseButtonFunc();
 public:
 	static Application* GetInstance();
 	~Application();
