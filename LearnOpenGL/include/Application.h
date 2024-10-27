@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <SDL2/SDL.h>
 #define APP Application::GetInstance()
 
@@ -7,7 +6,13 @@
 using WindowResizeFunc = void(*)(int width, int height);
 using KeyDownFunc = void(*)(SDL_Keycode keycode);
 using MouseWheelFunc = void(*)(float wheelY);
-using MouseButtonFunc = void(*)();
+using MouseButtonDownFunc = void(*)(Uint8 button, int x, int y);
+using MouseMotionFunc = void(*)(float x, float y);
+
+enum CursorMode {
+	CURSOR_LOCKED,
+	CURSOR_FREE,
+};
 
 class Application {
 	 
@@ -18,7 +23,7 @@ private:
 	SDL_Window* mWindow { nullptr };
 	SDL_GLContext mGLcontext{nullptr};
 	bool mIsRunning { true };
-
+	CursorMode mCursorMode{ CURSOR_LOCKED };
 	
 public:
 	void TEST(const char* text);
@@ -29,18 +34,25 @@ public:
 	void Close();
 	void Destroy();
 	void Render();
+	void LockCursor();
+	void UnLockCursor();
 public:
 	void SetWindowSize(int width, int height);
-
+	CursorMode GetCursorMode() const;
+private:
+	void SetCursorMode(CursorMode mode);
 private:
 	WindowResizeFunc mWindowResizeFunc{ nullptr };
 	KeyDownFunc mKeyDownFunc{ nullptr };
-	MouseWheelFunc mMouseWheel{ nullptr };
+	MouseWheelFunc mMouseWheelFunc{ nullptr };
+	MouseButtonDownFunc mMouseButtonDownFunc{ nullptr };
+	MouseMotionFunc mMouseMotionFunc{ nullptr };
 public:
 	void SetWindowResizeFunc(WindowResizeFunc func);
 	void SetKeyDownFunc(KeyDownFunc func);
 	void SetMouseWheelFunc(MouseWheelFunc func);
-	void SetMouseButtonFunc();
+	void SetMouseButtonDownFunc(MouseButtonDownFunc func);
+	void SetMouseMotioFunc(MouseMotionFunc func);
 public:
 	static Application* GetInstance();
 	~Application();

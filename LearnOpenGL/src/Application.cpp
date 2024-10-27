@@ -15,7 +15,7 @@ void Application::Close() {
 }
 
 void Application::TEST(const char* text) {
-	std::cout << text << std::endl;
+	spdlog::info("HALO");
 }
 
 bool Application::Init(const char* title, const int& width, const int& height) {
@@ -23,12 +23,16 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 
 	mWidth = width;
 	mHeight = height;
+
+	//spdlog::set_pattern("[%l] %v");
+
+
 	if (SDL_Init(SDL_INIT_VIDEO ) < 0) {
 		spdlog::error("Fail to init SDL : {}", SDL_GetError());
 		return false;
 	}
 	else {
-		spdlog::info("Success to init SDL");
+		spdlog::info("Success to init SDL"); 
 	}
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
@@ -57,7 +61,11 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 		spdlog::info("Success to init GLAD");
 	}
 	return true;
-	//LockCursor();
+	
+	if (mCursorMode == CURSOR_LOCKED) {
+		LockCursor();
+	}
+	
 }
 
 void Application::Update() {
@@ -78,9 +86,27 @@ void Application::Render() {
 	SDL_GL_SwapWindow(mWindow);
 }
 
+void Application::LockCursor() {
+	SetCursorMode(CursorMode::CURSOR_LOCKED);
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+}
+
+void Application::UnLockCursor() {
+	SetCursorMode(CursorMode::CURSOR_FREE);
+	SDL_SetRelativeMouseMode(SDL_FALSE);
+}
+
 void Application::SetWindowSize(int width, int height) {
 	mWidth = width;
 	mHeight = height;
+}
+
+CursorMode Application::GetCursorMode() const {
+	return mCursorMode;
+}
+
+void Application::SetCursorMode(CursorMode mode) {
+	mCursorMode = mode;
 }
 
 
@@ -89,22 +115,39 @@ void Application::ProcessInput() {
 	SDL_Event event;
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 	while (SDL_PollEvent(&event)) {
-
+		
 		// key down
 		if (event.type == SDL_EventType::SDL_KEYDOWN) {
 			if (mKeyDownFunc != nullptr) {
+				//mKeyDownFunc(event.key.keysym.scancode);
 				mKeyDownFunc(event.key.keysym.sym);
 			}
 		}
-		if (event.type == SDL_EventType::SDL_MOUSEBUTTONDOWN) {
-			
-		}
 		if (event.type == SDL_EventType::SDL_MOUSEMOTION) {
-
+			if (mMouseMotionFunc != nullptr ) {
+				float x, y;
+				if (mCursorMode == CursorMode::CURSOR_FREE) {
+					x = event.motion.x;
+					y = event.motion.y;
+				}
+				else {
+					x = event.motion.xrel;
+					y = event.motion.yrel;
+				}
+				mMouseMotionFunc(x, y);
+			}
+		}
+		if (event.type == SDL_MOUSEBUTTONDOWN) {
+			if (mMouseButtonDownFunc != nullptr) {
+				auto t = event.button.button;
+				int x = event.button.x;
+				int y = event.button.y;
+				mMouseButtonDownFunc(t, x, y);
+			}
 		}
 		if (event.type == SDL_EventType::SDL_MOUSEWHEEL) {
-			if (mMouseWheel != nullptr) {
-				mMouseWheel(event.wheel.y);
+			if (mMouseWheelFunc != nullptr) {
+				mMouseWheelFunc(event.wheel.y);
 			}
 		}
 		
@@ -137,7 +180,15 @@ void Application::SetKeyDownFunc(KeyDownFunc func) {
 }
 
 void Application::SetMouseWheelFunc(MouseWheelFunc func) {
-	mMouseWheel = func;
+	mMouseWheelFunc = func;
+}
+
+void Application::SetMouseButtonDownFunc(MouseButtonDownFunc func) {
+	mMouseButtonDownFunc = func;
+}
+
+void Application::SetMouseMotioFunc(MouseMotionFunc func) {
+	mMouseMotionFunc = func;
 }
 
 Application* Application::GetInstance() {

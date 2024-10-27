@@ -17,14 +17,14 @@ file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c" "include/*.h")
 
 
 
-file(GLOB_RECURSE ASSETS "./Assets")
+file(GLOB ASSETS "./Assets")
 file(COPY ${ASSETS} DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY ${LIBRARY_DIR}/SDL2/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
 
 
 Add_definitions(-DDEBUG)
 
-add_executable(${PROGRAM_NAME} ${SOURCES} "include/Window.h" )
+add_executable(${PROGRAM_NAME} ${SOURCES})
 # SDL2
 target_link_libraries(${PROGRAM_NAME} 
 	${LIBRARY_DIR}/SDL2/SDL2.lib

@@ -1,5 +1,7 @@
+#include <assert.h>
+#include <glad/glad.h>
+#include <spdlog/spdlog.h>
 #include "Debug.h"
-
 
 void CheckError() {
 	GLenum errorCode = glGetError();
@@ -13,7 +15,7 @@ void CheckError() {
 		default:					error = "UNKNOWN_ERROR";		break;
 		}
 		spdlog::error("{}", error);
-		exit(-1);
+		assert(false);
 	}
 }
 
