@@ -1,4 +1,4 @@
-#include "VBO.h"
+#include "OGL/VBO.h"
 #include "Debug.h"
 VBO::VBO(float* data, GLsizeiptr size, GLenum usage) {
 

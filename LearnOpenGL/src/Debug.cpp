@@ -3,7 +3,10 @@
 #include <spdlog/spdlog.h>
 #include "Debug.h"
 
-void CheckError() {
+
+
+
+void CheckGLError() {
 	GLenum errorCode = glGetError();
 	std::string error = "";
 	if (errorCode != GL_NO_ERROR) {

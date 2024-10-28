@@ -14,6 +14,12 @@ void Application::Close() {
 	mIsRunning = false;
 }
 
+
+
+float Application::GetDeltaTime() const {
+	return mDeltaTime;
+}
+
 void Application::TEST(const char* text) {
 	spdlog::info("HALO");
 }
@@ -25,7 +31,6 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 	mHeight = height;
 
 	//spdlog::set_pattern("[%l] %v");
-
 
 	if (SDL_Init(SDL_INIT_VIDEO ) < 0) {
 		spdlog::error("Fail to init SDL : {}", SDL_GetError());
@@ -60,12 +65,14 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 	else {
 		spdlog::info("Success to init GLAD");
 	}
-	return true;
-	
+
 	if (mCursorMode == CURSOR_LOCKED) {
 		LockCursor();
 	}
-	
+	GL_CALL(glViewport(0, 0, mWidth, mHeight));
+	GL_CALL(glEnable(GL_DEPTH_TEST));
+
+	return true;
 }
 
 void Application::Update() {
@@ -79,12 +86,17 @@ void Application::Destroy() {
 	
 }
 
-void Application::Render() {
+void Application::Clear() {
 	// render
 	GL_CALL(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
 	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+	
+}
+
+void Application::SwapFrameBuffer() {
 	SDL_GL_SwapWindow(mWindow);
 }
+
 
 void Application::LockCursor() {
 	SetCursorMode(CursorMode::CURSOR_LOCKED);
@@ -94,6 +106,11 @@ void Application::LockCursor() {
 void Application::UnLockCursor() {
 	SetCursorMode(CursorMode::CURSOR_FREE);
 	SDL_SetRelativeMouseMode(SDL_FALSE);
+}
+
+void Application::GetWindowSize(int& width, int& height) const {
+	width = mWidth;
+	height = mHeight;
 }
 
 void Application::SetWindowSize(int width, int height) {
@@ -111,6 +128,11 @@ void Application::SetCursorMode(CursorMode mode) {
 
 
 void Application::ProcessInput() {
+
+	float current = SDL_GetTicks() / 1000.0f;
+	mDeltaTime = current - mLastTime;
+	mLastTime = current;
+
 	// Poll Events
 	SDL_Event event;
 	const Uint8* state = SDL_GetKeyboardState(NULL);
@@ -168,7 +190,9 @@ void Application::ProcessInput() {
 		//processMouseInput(event);
 	}
 	// smooth keyboard
-	//processKeyboardInput(state, deltaTime);
+	if (mKeyPressedFunc != nullptr) {
+		mKeyPressedFunc(state);
+	}
 }
 
 void Application::SetWindowResizeFunc(WindowResizeFunc func) {
@@ -177,6 +201,10 @@ void Application::SetWindowResizeFunc(WindowResizeFunc func) {
 
 void Application::SetKeyDownFunc(KeyDownFunc func) {
 	mKeyDownFunc = func;
+}
+
+void Application::SetKeyPressedFunc(KeyPressedFunc func) {
+	mKeyPressedFunc = func;
 }
 
 void Application::SetMouseWheelFunc(MouseWheelFunc func) {

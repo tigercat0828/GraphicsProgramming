@@ -6,20 +6,116 @@
 #include <imgui/imgui_impl_opengl3.h>
 #include <spdlog/spdlog.h>
 #include "Shader.h"
-#include "stb_include.h"
 #include "Application.h"
 #include "Debug.h"
-#include "VAO.h"
-#include "VBO.h"
+#include "OGL/VAO.h"
+#include "OGL/VBO.h"
+#include "Texture.h"
+#include "Transform.h"
+#include "Camera.h"
+#include "Primitives/Cube.h"
+using namespace std;
+using namespace glm;
+
+static void OnResize(int width, int height);
+static void OnKeyDown(SDL_Keycode keycode);
+static void OnKeyPressed(const Uint8* state);
+static void OnMouseWheel(float wheelY);
+static void OnMouseMotion(float x, float y);
+static void OnMouseButtonDown(Uint8 button, int x, int y);
+
+Camera camera(glm::vec3(0, 0, -3), 0, -90);
+int main(int argc, char** argv) {
+
+	APP->TEST("Launch!!");
+	if (APP->Init("Main", 800, 600)) {
+		APP->SetWindowResizeFunc(OnResize);
+		APP->SetKeyDownFunc(OnKeyDown);
+		APP->SetKeyPressedFunc(OnKeyPressed);
+		APP->SetMouseWheelFunc(OnMouseWheel);
+		APP->SetMouseButtonDownFunc(OnMouseButtonDown);
+		APP->SetMouseMotioFunc(OnMouseMotion);
+		APP->LockCursor();
+	}
+	else {
+		exit(-1);
+	}
+	Cube::InitGL();
+	glm::vec3 cubePositions[] = {
+glm::vec3(0.0f,  0.0f,  0.0f),
+glm::vec3(2.0f,  5.0f, -15.0f),
+glm::vec3(-1.5f, -2.2f, -2.5f),
+glm::vec3(-3.8f, -2.0f, -12.3f),
+glm::vec3(2.4f, -0.4f, -3.5f),
+glm::vec3(-1.7f,  3.0f, -7.5f),
+glm::vec3(1.3f, -2.0f, -2.5f),
+glm::vec3(1.5f,  2.0f, -2.5f),
+glm::vec3(1.5f,  0.2f, -1.5f),
+glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
+	vector<Cube> cubes;
+	cubes.reserve(10);
+	for (const auto& pos : cubePositions) {
+		cubes.emplace_back(Transform(pos));
+	}
+	
+	Shader defaultShader("Basic.vert", "Basic.frag");
+	Texture texture("wall.jpg");
+	texture.AssignUnit(defaultShader, "uTexture", 0);
+
+	int width, height;
+	APP->GetWindowSize(width, height);
+	
+	while (APP->IsRunning()) {
+		APP->Clear();
+		APP->ProcessInput();
+
+		mat4 modelMat = mat4(1.0);
+		mat4 viewMat = mat4(1.0);
+		mat4 projMat = mat4(1.0);
+
+		defaultShader.Use();
+		glActiveTexture(GL_TEXTURE0);
+		texture.Bind();
+
+		viewMat = camera.GetViewMatrix();
+		projMat = camera.GetProjMatrix(width, height);
+		defaultShader.SetMat4("uViewMat", viewMat);
+		defaultShader.SetMat4("uProjMat", projMat);
+		defaultShader.SetMat4("uModelMat", modelMat);
+
+		int i = 1;
+		for (const auto& cube : cubes) {
+
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cube.transform.position);
+			float angle = 20.0f * i++;
+			model = glm::rotate(model, (float)(SDL_GetTicks() / 1000.0f) * glm::radians(20.0f * (i + 1)), glm::vec3(1.0f, 0.3f, 0.5f));
+			defaultShader.SetMat4("uModelMat", model);
+			cube.Render(defaultShader);
+		}
+		APP->SwapFrameBuffer();
+	}
+
+	Cube::ReleaseGLResource();
+	defaultShader.Delete();
+
+	APP->Destroy();
+	return 0;
+}
 
 static void OnResize(int width, int height) {
-	GL_CALL(glViewport(0, 0, width, height));
 	spdlog::info("Resize {} {}", width, height);
+	
+	
+	GL_CALL(glViewport(0, 0, width, height));
 }
 static void OnKeyDown(SDL_Keycode keycode) {
+	spdlog::info("Key {} pressed down", SDL_GetKeyName(keycode));
+	
 
-	const char* keyName = SDL_GetKeyName(keycode);
-	spdlog::info("Key {} pressed down", keyName);
+	
 	if (keycode == SDLK_ESCAPE) {
 		spdlog::info("window close");
 		APP->Close();
@@ -32,63 +128,52 @@ static void OnKeyDown(SDL_Keycode keycode) {
 		else {
 			APP->UnLockCursor();
 		}
-
 	}
+}
+void OnKeyPressed(const Uint8* state) {
+	//for (int i = 0; i < SDL_NUM_SCANCODES; ++i) if (state[i]) spdlog::info("Key {} pressed", SDL_GetScancodeName(static_cast<SDL_Scancode>(i)));
 
+	//float deltaTime = APP->mDeltaTime;
+	float deltaTime = APP->GetDeltaTime();
+	if (state[SDL_SCANCODE_W]) {
+		camera.Move(FORWARD, deltaTime);
+	}
+	if (state[SDL_SCANCODE_S]) {
+		camera.Move(BACKWARD, deltaTime);
+	}
+	if (state[SDL_SCANCODE_A]) {
+		camera.Move(LEFT, deltaTime);
+	}
+	if (state[SDL_SCANCODE_D]) {
+		camera.Move(RIGHT, deltaTime);
+	}
+	if (state[SDL_SCANCODE_LSHIFT]) {
+		camera.Move(DOWN, deltaTime);
+	}
+	if (state[SDL_SCANCODE_SPACE]) {
+		camera.Move(UP, deltaTime);
+	}
 }
 static void OnMouseWheel(float wheelY) {
-	if (wheelY > 0) {
-		spdlog::info("wheel up");
-	}
-	else if (wheelY < 0) {
-		spdlog::info("wheel down");
-	}
+	(wheelY > 0) ? spdlog::info("wheel up") : spdlog::info("wheel down");
+
+	camera.Zoom(wheelY * 3.0f);
 }
 static void OnMouseButtonDown(Uint8 button, int x, int y) {
-	if (button == SDL_BUTTON_LEFT) {
+	if (button == SDL_BUTTON_LEFT) 
 		spdlog::info("Left button click down ({}, {})", x, y);
-	}
-	else if (button == SDL_BUTTON_RIGHT) {
+	else if (button == SDL_BUTTON_RIGHT) 
 		spdlog::info("right button click down ({}, {})", x, y);
-	}
+	
 }
 static void OnMouseMotion(float x, float y) {
-
 	CursorMode mode = APP->GetCursorMode();
+
 	if (mode == CursorMode::CURSOR_FREE) {
 		spdlog::info("Mouse move to ({}, {})", x, y);
 	}
 	else {
 		spdlog::info("Mouse offset({}, {})", x, y);
+		camera.Turn(x, -y);
 	}
-	
-}
-int main(int argc, char** argv) {
-
-	using MyFun = int(*)(int, int);
-
-	APP->TEST("Launch!!");
-
-	if (APP->Init("Main", 800, 600)) {
-		APP->SetWindowResizeFunc(OnResize);
-		APP->SetKeyDownFunc(OnKeyDown);
-		APP->SetMouseWheelFunc(OnMouseWheel);
-		APP->SetMouseButtonDownFunc(OnMouseButtonDown);
-		APP->SetMouseMotioFunc(OnMouseMotion);
-		APP->LockCursor();
-	}
-	else {
-		exit(-1);
-	}
-	Shader basic("Basic.vert", "Basic.frag");
-	
-
-	while (APP->IsRunning()) {
-		APP->ProcessInput();
-		APP->Update();
-		APP->Render();
-	}
-
-	APP->Destroy();
-	return 0;
 }

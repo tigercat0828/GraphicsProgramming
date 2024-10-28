@@ -24,7 +24,7 @@ file(COPY ${LIBRARY_DIR}/SDL2/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
 
 Add_definitions(-DDEBUG)
 
-add_executable(${PROGRAM_NAME} ${SOURCES})
+add_executable(${PROGRAM_NAME} ${SOURCES} "src/PointCloud.cpp")
 # SDL2
 target_link_libraries(${PROGRAM_NAME} 
 	${LIBRARY_DIR}/SDL2/SDL2.lib

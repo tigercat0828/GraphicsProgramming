@@ -1,6 +1,6 @@
-#include "VAO.h"
+#include "OGL/VAO.h"
 #include "Debug.h"
-inline VAO::VAO() {
+VAO::VAO() {
 	glGenVertexArrays(1, &ID);
 }
 

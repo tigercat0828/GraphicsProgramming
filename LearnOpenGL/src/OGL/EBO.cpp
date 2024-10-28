@@ -1,4 +1,4 @@
-#include "EBO.h"
+#include "OGL/EBO.h"
 #include "Debug.h"
 
 EBO::EBO(GLuint* data, GLsizeiptr size, GLenum usage) {
