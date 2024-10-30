@@ -28,7 +28,7 @@ private:
 	float sensitivity;
 	float zoom;
 public:
-	Camera(glm::vec3 position, float yaw = -90.0f, float pitch = 0.0f);
+	Camera(glm::vec3 position, float pitch = -30.0f, float yaw = -90.0f );
 	glm::mat4 GetViewMatrix() const;
 	glm::mat4 GetProjMatrix(float width, float height) const;
 	void Zoom(float yOffset);

@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera(glm::vec3 position, float yaw, float pitch) {
+Camera::Camera(glm::vec3 position, float pitch, float yaw ) {
 
 	this->yaw = yaw;
 	this->pitch = pitch;

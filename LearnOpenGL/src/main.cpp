@@ -8,7 +8,6 @@
 #include "Shader.h"
 #include "Application.h"
 #include "Debug.h"
-#include "OGL/VAO.h"
 #include "OGL/VBO.h"
 #include "Texture.h"
 #include "Transform.h"
@@ -24,11 +23,11 @@ static void OnMouseWheel(float wheelY);
 static void OnMouseMotion(float x, float y);
 static void OnMouseButtonDown(Uint8 button, int x, int y);
 
-Camera camera(glm::vec3(0, 0, -3), 0, -90);
+Camera camera(glm::vec3(3, 3, 3 ), -30, -90);
 int main(int argc, char** argv) {
 
 	APP->TEST("Launch!!");
-	if (APP->Init("Main", 800, 600)) {
+	if (APP->Init("Main", 600, 600)) {
 		APP->SetWindowResizeFunc(OnResize);
 		APP->SetKeyDownFunc(OnKeyDown);
 		APP->SetKeyPressedFunc(OnKeyPressed);
@@ -40,27 +39,42 @@ int main(int argc, char** argv) {
 	else {
 		exit(-1);
 	}
+	PrintInfo();
 	Cube::InitGL();
-	glm::vec3 cubePositions[] = {
-glm::vec3(0.0f,  0.0f,  0.0f),
-glm::vec3(2.0f,  5.0f, -15.0f),
-glm::vec3(-1.5f, -2.2f, -2.5f),
-glm::vec3(-3.8f, -2.0f, -12.3f),
-glm::vec3(2.4f, -0.4f, -3.5f),
-glm::vec3(-1.7f,  3.0f, -7.5f),
-glm::vec3(1.3f, -2.0f, -2.5f),
-glm::vec3(1.5f,  2.0f, -2.5f),
-glm::vec3(1.5f,  0.2f, -1.5f),
-glm::vec3(-1.3f,  1.0f, -1.5f)
+	vec3 cubePositions[] = {
+		vec3(0.0f,  0.0f,  0.0f),
+		vec3(2.0f,  5.0f, -15.0f),
+		vec3(-1.5f, -2.2f, -2.5f),
+		vec3(-3.8f, -2.0f, -12.3f),
+		vec3(2.4f, -0.4f, -3.5f),
+		vec3(-1.7f,  3.0f, -7.5f),
+		vec3(1.3f, -2.0f, -2.5f),
+		vec3(1.5f,  2.0f, -2.5f),
+		vec3(1.5f,  0.2f, -1.5f),
+		vec3(-1.3f,  1.0f, -1.5f)
 	};
-
 	vector<Cube> cubes;
 	cubes.reserve(10);
-	for (const auto& pos : cubePositions) {
-		cubes.emplace_back(Transform(pos));
-	}
+	for (const auto& pos : cubePositions) 	cubes.emplace_back(Transform(pos));
 	
-	Shader defaultShader("Basic.vert", "Basic.frag");
+
+	VAO vao;
+	vao.Bind();
+	float vertices[] = {
+		0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 1.0f,
+	};
+	VBO vbo(vertices, sizeof(vertices), GL_STATIC_DRAW);
+	vao.AttribPointer(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	vao.AttribPointer(vbo, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	vao.UnBind();
+	
+	Shader defaultShader("TextureUnlit.vert", "TextureUnlit.frag");
+	Shader axisShader("axis.vert", "axis.frag");
 	Texture texture("wall.jpg");
 	texture.AssignUnit(defaultShader, "uTexture", 0);
 
@@ -74,20 +88,30 @@ glm::vec3(-1.3f,  1.0f, -1.5f)
 		mat4 modelMat = mat4(1.0);
 		mat4 viewMat = mat4(1.0);
 		mat4 projMat = mat4(1.0);
+		viewMat = camera.GetViewMatrix();
+		projMat = camera.GetProjMatrix(width, height);
+
+		axisShader.Use();
+		axisShader.SetMat4("uViewMat", viewMat);
+		axisShader.SetMat4("uProjMat", projMat);
+		axisShader.SetMat4("uModelMat", modelMat);
+		vao.Bind();
+		// todo : show assert line
+		GL_CALL(glLineWidth(2.0f));
+		GL_CALL(glDrawArrays(GL_LINES, 0, 6));
+		GL_CALL(glLineWidth(2.0f));
+		vao.UnBind();
 
 		defaultShader.Use();
 		glActiveTexture(GL_TEXTURE0);
 		texture.Bind();
 
-		viewMat = camera.GetViewMatrix();
-		projMat = camera.GetProjMatrix(width, height);
+		
 		defaultShader.SetMat4("uViewMat", viewMat);
 		defaultShader.SetMat4("uProjMat", projMat);
 		defaultShader.SetMat4("uModelMat", modelMat);
-
 		int i = 1;
 		for (const auto& cube : cubes) {
-
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, cube.transform.position);
 			float angle = 20.0f * i++;
@@ -107,14 +131,11 @@ glm::vec3(-1.3f,  1.0f, -1.5f)
 
 static void OnResize(int width, int height) {
 	spdlog::info("Resize {} {}", width, height);
-	
-	
+	APP->SetWindowSize(width, height);
 	GL_CALL(glViewport(0, 0, width, height));
 }
 static void OnKeyDown(SDL_Keycode keycode) {
-	spdlog::info("Key {} pressed down", SDL_GetKeyName(keycode));
-	
-
+	//spdlog::info("Key {} pressed down", SDL_GetKeyName(keycode));
 	
 	if (keycode == SDLK_ESCAPE) {
 		spdlog::info("window close");
@@ -170,10 +191,10 @@ static void OnMouseMotion(float x, float y) {
 	CursorMode mode = APP->GetCursorMode();
 
 	if (mode == CursorMode::CURSOR_FREE) {
-		spdlog::info("Mouse move to ({}, {})", x, y);
+		//spdlog::info("Mouse move to ({}, {})", x, y);
 	}
 	else {
-		spdlog::info("Mouse offset({}, {})", x, y);
+		//spdlog::info("Mouse offset({}, {})", x, y);
 		camera.Turn(x, -y);
 	}
 }

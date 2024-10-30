@@ -3,7 +3,7 @@
 
 #include "VBO.h"
 
-struct VAO {
+class VAO {
 public:
 	GLuint ID;
 	VAO();

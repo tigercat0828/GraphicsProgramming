@@ -20,7 +20,6 @@ void Cube::InitGL() {
 	sVAO->AttribPointer(*sVBO, 1, 2, GL_FLOAT, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	sVAO->UnBind();
-	sVBO->UnBind();
 }
 
 void Cube::ReleaseGLResource() {
