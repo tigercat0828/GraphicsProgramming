@@ -73,8 +73,8 @@ int main(int argc, char** argv) {
 	vao.AttribPointer(vbo, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	vao.UnBind();
 	
-	Shader defaultShader("TextureUnlit.vert", "TextureUnlit.frag");
-	Shader axisShader("axis.vert", "axis.frag");
+	Shader defaultShader("xyzuv.vert", "xyzuv.frag");
+	Shader axisShader("xyzrgb.vert", "xyzrgb.frag");
 	Texture texture("wall.jpg");
 	texture.AssignUnit(defaultShader, "uTexture", 0);
 

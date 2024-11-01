@@ -15,7 +15,7 @@ public:
 	static void InitGL();
 	static void ReleaseGLResource();
 
-public:
+private:
 	static float CubeVertices[180];
 	inline static VAO* sVAO = nullptr;
 	inline static VBO* sVBO = nullptr;
