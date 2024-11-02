@@ -83,7 +83,6 @@ void Application::Destroy() {
 	SDL_GL_DeleteContext(mGLcontext);
 	SDL_DestroyWindow(mWindow);
 	SDL_Quit();
-	
 }
 
 void Application::Clear() {
@@ -226,6 +225,5 @@ Application* Application::GetInstance() {
 	return mInstance;
 }
 
-Application::~Application() {}
 Application::Application() {}
 

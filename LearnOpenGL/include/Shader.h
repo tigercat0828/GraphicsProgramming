@@ -6,6 +6,7 @@ class Shader {
 public:
 	GLuint ID;
 	std::string Name;
+	Shader() = default;
 	Shader(const char* vsFile, const char* fsFile);
 	void Use() const;
 	void Unuse() const;

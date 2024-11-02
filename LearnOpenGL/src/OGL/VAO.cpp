@@ -8,13 +8,18 @@ void VAO::AttribPointer(const VBO& vbo, GLuint layout, int size, GLenum type, GL
 	vbo.Bind();
 	GL_CALL(glVertexAttribPointer(layout, size, type, GL_FALSE, stride, offset));
 	GL_CALL(glEnableVertexAttribArray(layout));
-	vbo.UnBind();
+	vbo.Unbind();
+}
+void VAO::AttribPointer(GLuint layout, int size, GLenum type, GLsizei stride, const void* offset) const
+{
+	GL_CALL(glVertexAttribPointer(layout, size, type, GL_FALSE, stride, offset));
+	GL_CALL(glEnableVertexAttribArray(layout));
 }
 void VAO::Bind() const {
 	GL_CALL(glBindVertexArray(ID));
 }
 
-void VAO::UnBind() const {
+void VAO::Unbind() const {
 	GL_CALL(glBindVertexArray(0));
 }
 

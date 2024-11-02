@@ -8,18 +8,18 @@ Cube::Cube(Transform transform) {
 void Cube::Render(const Shader& shader) const {
 	sVAO->Bind();
 	GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 36));
-	sVAO->UnBind();
+	sVAO->Unbind();
 }
 
 void Cube::InitGL() {
 	sVAO = new VAO();
+	sVBO = new VBO(CubeVertices, sizeof(CubeVertices), GL_STATIC_DRAW);
 	sVAO->Bind();
-
-	sVBO = new  VBO(CubeVertices, sizeof(CubeVertices), GL_STATIC_DRAW);
-	sVAO->AttribPointer(*sVBO, 0, 3, GL_FLOAT, 5 * sizeof(float), (void*)0);
-	sVAO->AttribPointer(*sVBO, 1, 2, GL_FLOAT, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-	sVAO->UnBind();
+	sVBO->Bind();
+	sVAO->AttribPointer(0, 3, GL_FLOAT, 5 * sizeof(float), (void*)0);
+	sVAO->AttribPointer(1, 2, GL_FLOAT, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	sVBO->Unbind();
+	sVAO->Unbind();
 }
 
 void Cube::ReleaseGLResource() {

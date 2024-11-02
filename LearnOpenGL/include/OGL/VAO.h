@@ -9,7 +9,8 @@ public:
 	VAO();
 
 	void AttribPointer(const VBO& vbo, GLuint layout, int size, GLenum type, GLsizei stride, const void* offset) const;
+	void AttribPointer(GLuint layout, int size, GLenum type, GLsizei stride, const void* offset) const;
 	void Bind() const;
-	void UnBind() const;
+	void Unbind() const;
 	void Delete() const;
 };

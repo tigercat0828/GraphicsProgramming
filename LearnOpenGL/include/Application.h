@@ -66,7 +66,6 @@ public:
 	
 public:
 	static Application* GetInstance();
-	~Application();
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 private:

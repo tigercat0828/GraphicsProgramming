@@ -3,18 +3,18 @@
 
 class Color {
 public:
-    static const glm::vec3 RED;
-    static const glm::vec3 GREEN;
-    static const glm::vec3 BLUE;
-    static const glm::vec3 WHITE;
-    static const glm::vec3 BLACK;
-    static const glm::vec3 YELLOW;
-    static const glm::vec3 CYAN;
-    static const glm::vec3 MAGENTA;
-    static const glm::vec3 ORANGE;
-    static const glm::vec3 PURPLE;
-    static const glm::vec3 GRAY;
-    static const glm::vec3 LIGHT_GRAY;
-    static const glm::vec3 DARK_GRAY;
+    static const glm::vec3 Red;
+    static const glm::vec3 Green;
+    static const glm::vec3 Blue;
+    static const glm::vec3 White;
+    static const glm::vec3 Black;
+    static const glm::vec3 Yellow;
+    static const glm::vec3 Cyan;
+    static const glm::vec3 Magenta;
+    static const glm::vec3 Orange;
+    static const glm::vec3 Purple;
+    static const glm::vec3 Gray;
+    static const glm::vec3 LightGray;
+    static const glm::vec3 DarkGray;
 };
 // 在類別外部定義靜態成員
