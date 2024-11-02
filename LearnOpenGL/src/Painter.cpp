@@ -5,6 +5,7 @@ Painter::Painter()
 {
 	Shader shader("xyzUrgb.vert", "xyzUrgb.frag");
 	mShader = shader;
+	mShader.Use();
 	SetColor(Color::White);
 	mVAO = VAO();
 	mVBO = VBO(mVertices, sizeof(mVertices), GL_DYNAMIC_DRAW);
@@ -15,8 +16,17 @@ Painter::Painter()
 	mVAO.Unbind();
 }
 
-void Painter::DrawQuad(glm::vec3 a, glm::vec3 b, glm::vec3 c) 
-{
+void Painter::DrawQuad(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
+	mVertices[0] = a;
+	mVertices[1] = b;
+	mVertices[2] = c;
+	mVertices[3] = b + c - a;
+	mVAO.Bind();
+	mVBO.Bind();
+	mVBO.SubData(0, 4 * sizeof(glm::vec3), mVertices);
+	GL_CALL(glDrawArrays(GL_TRIANGLE_STRIP, 0, 12));
+	mVBO.Unbind();
+	mVAO.Unbind();
 }
 void Painter::DrawAxis()
 {
@@ -35,8 +45,7 @@ void Painter::DrawTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 	mVAO.Bind();
 	mVBO.Bind();
 	mVBO.SubData(0, 3 * sizeof(glm::vec3), mVertices);
-	GL_CALL();
-	glDrawArrays(GL_TRIANGLES, 0, 9);
+	GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 9));
 	mVBO.Unbind();
 	mVAO.Unbind();
 }
@@ -65,10 +74,9 @@ void Painter::DrawPoint(glm::vec3 a)
 void Painter::Use() {
 	mShader.Use();
 }
-void Painter::SetColor(glm::vec3 color)
+void Painter::SetColor(const glm::vec3& color)
 {
 	mColor = color;
-	mShader.Use();
 	mShader.SetVec3("uColor", mColor);
 }
 

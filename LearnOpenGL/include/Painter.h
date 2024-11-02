@@ -16,7 +16,7 @@ public:
 	void DrawLine(glm::vec3 a, glm::vec3 b) ;
 	void DrawPoint(glm::vec3 a);
 	void Use();
-	void SetColor(glm::vec3 color);
+	void SetColor( const glm::vec3& color);
 	void SetPointSize(float size);
 	void SetLineWidth(float width);
 	void SetMVPMat(glm::mat4 modelMat, glm::mat4 viewMat, glm::mat4 projMat);
