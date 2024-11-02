@@ -14,7 +14,8 @@ public:
 	void DrawAxis();
 	void DrawTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c) ;
 	void DrawLine(glm::vec3 a, glm::vec3 b) ;
-	void DrawPoint(glm::vec3 a) ;
+	void DrawPoint(glm::vec3 a);
+	void Use();
 	void SetColor(glm::vec3 color);
 	void SetPointSize(float size);
 	void SetLineWidth(float width);

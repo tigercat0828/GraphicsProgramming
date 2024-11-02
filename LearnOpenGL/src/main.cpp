@@ -86,6 +86,7 @@ int main(int argc, char** argv) {
 
 		static float Time = 0;
 		Time += APP->GetDeltaTime();
+		painter.Use();
 		painter.SetColor(Color::Yellow);
 		painter.DrawLine(vec3(0, 0, 0), vec3(Time, Time, Time));
 		painter.DrawAxis();

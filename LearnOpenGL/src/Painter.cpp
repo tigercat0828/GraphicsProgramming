@@ -29,7 +29,6 @@ void Painter::DrawAxis()
 }
 void Painter::DrawTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 {
-	mShader.Use();
 	mVertices[0] = a;
 	mVertices[1] = b;
 	mVertices[2] = c;
@@ -38,11 +37,12 @@ void Painter::DrawTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 	mVBO.SubData(0, 3 * sizeof(glm::vec3), mVertices);
 	GL_CALL();
 	glDrawArrays(GL_TRIANGLES, 0, 9);
+	mVBO.Unbind();
+	mVAO.Unbind();
 }
 void Painter::DrawLine(glm::vec3 a, glm::vec3 b) 
 {
 	// todo use sub data to update vertice data
-	mShader.Use();
 	mVertices[0] = a;
 	mVertices[1] = b;
 	mVAO.Bind();
@@ -54,6 +54,16 @@ void Painter::DrawLine(glm::vec3 a, glm::vec3 b)
 }
 void Painter::DrawPoint(glm::vec3 a)
 {
+	mVertices[0] = a;
+	mVAO.Bind();
+	mVBO.Bind();
+	mVBO.SubData(0, sizeof(glm::vec3), mVertices);
+	GL_CALL(glDrawArrays(GL_POINT, 0, 1));
+	mVBO.Unbind();
+	mVAO.Unbind();
+}
+void Painter::Use() {
+	mShader.Use();
 }
 void Painter::SetColor(glm::vec3 color)
 {
