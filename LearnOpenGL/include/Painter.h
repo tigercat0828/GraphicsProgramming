@@ -11,6 +11,7 @@ public:
 	/// Draw the parallelogram expanded by the vectors AB, AC
 	/// </summary>
 	void DrawQuad(glm::vec3 a, glm::vec3 b, glm::vec3 c) ;
+	void DrawAxis();
 	void DrawTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c) ;
 	void DrawLine(glm::vec3 a, glm::vec3 b) ;
 	void DrawPoint(glm::vec3 a) ;

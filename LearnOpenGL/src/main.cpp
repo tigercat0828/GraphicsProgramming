@@ -58,30 +58,14 @@ int main(int argc, char** argv) {
 	cubes.reserve(10);
 	for (const auto& pos : cubePositions) 	cubes.emplace_back(Transform(pos));
 	
-
-	VAO vao;
-	vao.Bind();
-	float vertices[] = {
-		0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 1.0f,
-	};
-	VBO vbo(vertices, sizeof(vertices), GL_STATIC_DRAW);
-	vao.AttribPointer(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
-	vao.AttribPointer(vbo, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	vao.Unbind();
-	
 	Shader defaultShader("xyzuv.vert", "xyzuv.frag");
-	Shader axisShader("xyzrgb.vert", "xyzrgb.frag");
-
 	Painter painter;
-	painter.SetColor(Color::Yellow);
 	
+
+	
+	painter.SetLineWidth(3);
 	Texture texture("wall.jpg");
-	texture.AssignUnit(defaultShader, "uTexture", 0);
+	
 
 	int width, height;
 	APP->GetWindowSize(width, height);
@@ -89,38 +73,35 @@ int main(int argc, char** argv) {
 	while (APP->IsRunning()) {
 		APP->Clear();
 		APP->ProcessInput();
-
 		mat4 modelMat = mat4(1.0);
 		mat4 viewMat = mat4(1.0);
 		mat4 projMat = mat4(1.0);
-
 		viewMat = camera.GetViewMatrix();
 		projMat = camera.GetProjMatrix(width, height);
-
 		painter.SetMVPMat(modelMat, viewMat, projMat);
-		painter.SetLineWidth(3);
+
+
+
+		
+
 		static float Time = 0;
 		Time += APP->GetDeltaTime();
+		painter.SetColor(Color::Yellow);
 		painter.DrawLine(vec3(0, 0, 0), vec3(Time, Time, Time));
-
-		axisShader.Use();
-		axisShader.SetMat4("uViewMat", viewMat);
-		axisShader.SetMat4("uProjMat", projMat);
-		axisShader.SetMat4("uModelMat", modelMat);
-		vao.Bind();
-		// todo : show assert line
-		GL_CALL(glLineWidth(2.0f));
-		GL_CALL(glDrawArrays(GL_LINES, 0, 6));
-		GL_CALL(glLineWidth(2.0f));
-		vao.Unbind();
+		painter.DrawAxis();
 
 		defaultShader.Use();
 		glActiveTexture(GL_TEXTURE0);
 		texture.Bind();
-		
+		texture.AssignUnit(defaultShader, "uTexture", 0);
+
+
 		defaultShader.SetMat4("uViewMat", viewMat);
 		defaultShader.SetMat4("uProjMat", projMat);
 		defaultShader.SetMat4("uModelMat", modelMat);
+
+
+
 		int i = 1;
 		for (const auto& cube : cubes) {
 			glm::mat4 model = glm::mat4(1.0f);

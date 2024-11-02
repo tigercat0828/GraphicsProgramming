@@ -18,8 +18,26 @@ Painter::Painter()
 void Painter::DrawQuad(glm::vec3 a, glm::vec3 b, glm::vec3 c) 
 {
 }
+void Painter::DrawAxis()
+{
+	SetColor(Color::Red);
+	DrawLine(glm::vec3(0, 0, 0), glm::vec3(10, 0, 0));
+	SetColor(Color::Green);
+	DrawLine(glm::vec3(0, 0, 0), glm::vec3(0, 10, 0));
+	SetColor(Color::Blue);
+	DrawLine(glm::vec3(0, 0, 0), glm::vec3(0, 0, 10));
+}
 void Painter::DrawTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 {
+	mShader.Use();
+	mVertices[0] = a;
+	mVertices[1] = b;
+	mVertices[2] = c;
+	mVAO.Bind();
+	mVBO.Bind();
+	mVBO.SubData(0, 3 * sizeof(glm::vec3), mVertices);
+	GL_CALL();
+	glDrawArrays(GL_TRIANGLES, 0, 9);
 }
 void Painter::DrawLine(glm::vec3 a, glm::vec3 b) 
 {
@@ -29,9 +47,8 @@ void Painter::DrawLine(glm::vec3 a, glm::vec3 b)
 	mVertices[1] = b;
 	mVAO.Bind();
 	mVBO.Bind();
-	//mVBO.SetData(mVertices, sizeof(mVertices), GL_DYNAMIC_DRAW);
 	mVBO.SubData(0,2*sizeof(glm::vec3),mVertices);
-	GL_CALL(glDrawArrays(GL_LINES, 0, 12));
+	GL_CALL(glDrawArrays(GL_LINES, 0, 6));
 	mVBO.Unbind();
 	mVAO.Unbind();
 }
