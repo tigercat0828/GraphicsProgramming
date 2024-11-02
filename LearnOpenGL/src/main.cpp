@@ -28,7 +28,7 @@ Camera camera(glm::vec3(3, 3, 3 ), -30, -90);
 int main(int argc, char** argv) {
 
 	APP->TEST("Launch!!");
-	if (APP->Init("Main", 600, 600)) {
+	if (APP->Init("Main", 1200, 1200)) {
 		APP->SetWindowResizeFunc(OnResize);
 		APP->SetKeyDownFunc(OnKeyDown);
 		APP->SetKeyPressedFunc(OnKeyPressed);
@@ -43,7 +43,6 @@ int main(int argc, char** argv) {
 	PrintInfo();
 	Cube::InitGL();
 	vec3 cubePositions[] = {
-		vec3(0.0f,  0.0f,  0.0f),
 		vec3(2.0f,  5.0f, -15.0f),
 		vec3(-1.5f, -2.2f, -2.5f),
 		vec3(-3.8f, -2.0f, -12.3f),
@@ -55,7 +54,7 @@ int main(int argc, char** argv) {
 		vec3(-1.3f,  1.0f, -1.5f)
 	};
 	vector<Cube> cubes;
-	cubes.reserve(10);
+	cubes.reserve(9);
 	for (const auto& pos : cubePositions) 	cubes.emplace_back(Transform(pos));
 	
 	Shader defaultShader("xyzuv.vert", "xyzuv.frag");
@@ -82,27 +81,29 @@ int main(int argc, char** argv) {
 
 
 
-		
-
 		static float Time = 0;
 		Time += APP->GetDeltaTime();
+		
+
 		painter.Use();
 		painter.SetColor(Color::Yellow);
-		painter.DrawLine(vec3(0, 0, 0), vec3(Time, Time, Time));
+		painter.DrawLine(vec3(0, 0, 0), vec3(Time, 0, Time));
 		painter.DrawAxis();
-
+		painter.SetColor(Color::Cyan);
+		painter.DrawTriangle(vec3(0,0,0),vec3(1,0,2),vec3(2,0,1));
+		painter.SetPointSize(3);
+		
+		painter.DrawPoint(vec3(3,3,3));
+		
 		defaultShader.Use();
+		
 		glActiveTexture(GL_TEXTURE0);
 		texture.Bind();
 		texture.AssignUnit(defaultShader, "uTexture", 0);
 
-
 		defaultShader.SetMat4("uViewMat", viewMat);
 		defaultShader.SetMat4("uProjMat", projMat);
 		defaultShader.SetMat4("uModelMat", modelMat);
-
-
-
 		int i = 1;
 		for (const auto& cube : cubes) {
 			glm::mat4 model = glm::mat4(1.0f);
@@ -112,6 +113,7 @@ int main(int argc, char** argv) {
 			defaultShader.SetMat4("uModelMat", model);
 			cube.Render(defaultShader);
 		}
+
 		APP->SwapFrameBuffer();
 	}
 
