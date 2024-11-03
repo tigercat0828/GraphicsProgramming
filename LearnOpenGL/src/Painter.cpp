@@ -1,9 +1,8 @@
 #include "Painter.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "Debug.h"
-Painter::Painter()
+Painter::Painter(const Shader& shader)
 {
-	Shader shader("xyzUrgb.vert", "xyzUrgb.frag");
 	mShader = shader;
 	SetColor(Color::White);
 	mVAO = VAO();
@@ -84,7 +83,7 @@ void Painter::SetLineWidth(float width)
 	GL_CALL(glLineWidth(width));
 }
 
-void Painter::SetMVPMat(const glm::mat4& modelMat, const glm::mat4& viewMat, const glm::mat4& projMat)
+void Painter::SetMatMVP(const glm::mat4& modelMat, const glm::mat4& viewMat, const glm::mat4& projMat)
 {
 	mShader.Use();
 	mShader.SetMat4("uProjMat", projMat);

@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 class Shader {
 public:
-	GLuint ID;
+	GLuint ID{0};
 	std::string Name;
 	Shader() = default;
 	Shader(const char* vsFile, const char* fsFile);

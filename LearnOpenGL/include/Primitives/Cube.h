@@ -9,7 +9,7 @@ public:
 	Cube() = default;
 	Cube(Transform transform);
 
-	void Render(const Shader& shader) const;
+	void Render() const;
 
 public:
 	static void InitGL();

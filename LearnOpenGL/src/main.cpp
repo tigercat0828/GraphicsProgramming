@@ -14,6 +14,8 @@
 #include "Camera.h"
 #include "Primitives/Cube.h"
 #include "Painter.h"
+#include "PLYfile.h"
+#include "Primitives/PointCloud.h"
 using namespace std;
 using namespace glm;
 
@@ -28,7 +30,7 @@ Camera camera(glm::vec3(3, 3, 3 ), -30, -90);
 int main(int argc, char** argv) {
 
 	APP->TEST("Launch!!");
-	if (APP->Init("Main", 1200, 1200)) {
+	if (APP->Init("Main", 1440, 900)) {
 		APP->SetWindowResizeFunc(OnResize);
 		APP->SetKeyDownFunc(OnKeyDown);
 		APP->SetKeyPressedFunc(OnKeyPressed);
@@ -36,35 +38,31 @@ int main(int argc, char** argv) {
 		APP->SetMouseButtonDownFunc(OnMouseButtonDown);
 		APP->SetMouseMotioFunc(OnMouseMotion);
 		APP->LockCursor();
+		PrintInfo();
 	}
 	else {
 		exit(-1);
 	}
-	PrintInfo();
-	Cube::InitGL();
-	vec3 cubePositions[] = {
-		vec3(2.0f,  5.0f, -15.0f),
-		vec3(-1.5f, -2.2f, -2.5f),
-		vec3(-3.8f, -2.0f, -12.3f),
-		vec3(2.4f, -0.4f, -3.5f),
-		vec3(-1.7f,  3.0f, -7.5f),
-		vec3(1.3f, -2.0f, -2.5f),
-		vec3(1.5f,  2.0f, -2.5f),
-		vec3(1.5f,  0.2f, -1.5f),
-		vec3(-1.3f,  1.0f, -1.5f)
-	};
-	vector<Cube> cubes;
-	cubes.reserve(9);
-	for (const auto& pos : cubePositions) 	cubes.emplace_back(Transform(pos));
 	
-	Shader defaultShader("xyzuv.vert", "xyzuv.frag");
-	Painter painter;
+		
+	// Laod Textures
+	Texture texture("wall.jpg");
+	// Compile Shaders
+	Shader painterShader("Painter.vert", "Painter.frag");
+	Shader pointCloudShader("PointCloud.vert", "PointCloud.frag");
+	// Load Files
+	string plyfile = "input.ply";
+	PLYfile ply;
+	if (!ply.LoadFile(plyfile)) spdlog::error("failed to load .ply file {}", plyfile);
+
+	GL_CALL(glPointSize(1.0f));
+	// GameObjects
+	Painter painter(painterShader);
+	painter.SetLineWidth(3);
+	PointCloud cloud(pointCloudShader, ply);
 	
 
-	
-	painter.SetLineWidth(3);
-	Texture texture("wall.jpg");
-	
+
 
 	int width, height;
 	APP->GetWindowSize(width, height);
@@ -72,55 +70,29 @@ int main(int argc, char** argv) {
 	while (APP->IsRunning()) {
 		APP->Clear();
 		APP->ProcessInput();
+		APP->NewImGuiFrame();
+
+		ImGui::Begin("FPS Counter");
+		ImGui::Text("FPS: %.0f", 1 / APP->GetDeltaTime());
+		ImGui::End();
+
 		mat4 modelMat = mat4(1.0);
 		mat4 viewMat = mat4(1.0);
 		mat4 projMat = mat4(1.0);
 		viewMat = camera.GetViewMatrix();
 		projMat = camera.GetProjMatrix(width, height);
-		painter.SetMVPMat(modelMat, viewMat, projMat);
-
-
-
-		static float Time = 0;
-		Time += APP->GetDeltaTime();
 		
-
+		painter.SetMatMVP(modelMat, viewMat, projMat);
 		painter.Use();
-		painter.SetColor(Color::Yellow);
-		painter.DrawLine(vec3(0, 0, 0), vec3(Time, 0, Time));
 		painter.DrawAxis();
-		painter.SetColor(Color::Cyan);
-		painter.DrawTriangle(vec3(0,0,0),vec3(1,0,2),vec3(2,0,1));
-		painter.SetPointSize(3);
+		cloud.Render(modelMat, viewMat, projMat);
 		
-		painter.DrawPoint(vec3(3,3,3));
 		
-		defaultShader.Use();
-		
-		glActiveTexture(GL_TEXTURE0);
-		texture.Bind();
-		texture.AssignUnit(defaultShader, "uTexture", 0);
-
-		defaultShader.SetMat4("uViewMat", viewMat);
-		defaultShader.SetMat4("uProjMat", projMat);
-		defaultShader.SetMat4("uModelMat", modelMat);
-		int i = 1;
-		for (const auto& cube : cubes) {
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cube.transform.position);
-			float angle = 20.0f * i++;
-			model = glm::rotate(model, (float)(SDL_GetTicks() / 1000.0f) * glm::radians(20.0f * (i + 1)), glm::vec3(1.0f, 0.3f, 0.5f));
-			defaultShader.SetMat4("uModelMat", model);
-			cube.Render(defaultShader);
-		}
-
+	
 		APP->SwapFrameBuffer();
 	}
 
-	Cube::ReleaseGLResource();
 	painter.ReleaseGLResource();
-	defaultShader.Delete();
-
 	APP->Destroy();
 	return 0;
 }

@@ -6,7 +6,7 @@
 #include "Shader.h"
 class Painter {
 public:
-	Painter();
+	Painter(const Shader& shader);
 	/// <summary>
 	/// Draw the parallelogram expanded by the vectors AB, AC
 	/// </summary>
@@ -19,7 +19,7 @@ public:
 	void SetColor(const glm::vec3& color);
 	void SetPointSize(float size);
 	void SetLineWidth(float width);
-	void SetMVPMat(const glm::mat4& modelMat, const glm::mat4& viewMat, const glm::mat4& projMat);
+	void SetMatMVP(const glm::mat4& modelMat, const glm::mat4& viewMat, const glm::mat4& projMat);
 	void ReleaseGLResource();
 private:
 	glm::vec3 mColor{ Color::Orange };
