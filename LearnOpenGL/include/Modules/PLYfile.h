@@ -5,9 +5,9 @@
 #include <string>
 #include <filesystem>
 #include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
 #include "OGL/VAO.h"
 #include "OGL/VBO.h"
-#include <spdlog/spdlog.h>
 /// <summary>
 /// format: (x,y,z,nx,ny,nz,r,g,b)
 /// </summary>

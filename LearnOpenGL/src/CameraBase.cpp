@@ -1,6 +1,6 @@
-#include "Camera.h"
+#include "CameraBase.h"
 
-Camera::Camera(glm::vec3 position, float pitch, float yaw ) {
+CameraBase::CameraBase(glm::vec3 position, float pitch, float yaw ) {
 
 	this->yaw = yaw;
 	this->pitch = pitch;
@@ -14,21 +14,21 @@ Camera::Camera(glm::vec3 position, float pitch, float yaw ) {
 	UpdateVectors();
 }
 
-glm::mat4 Camera::GetViewMatrix() const {
+glm::mat4 CameraBase::GetViewMatrix() const {
 	return glm::lookAt(position, position + front, up);
 }
 
-glm::mat4 Camera::GetProjMatrix(float width, float height) const {
+glm::mat4 CameraBase::GetProjMatrix(float width, float height) const {
 	return glm::perspective(glm::radians(zoom), width / height, 0.1f, 100.0f); // 100 is view distance
 }
 
-void Camera::Zoom(float yOffset) {
+void CameraBase::Zoom(float yOffset) {
 	zoom -= yOffset;
 	if (zoom < 1.0) zoom = 1.0f;
 	if (zoom > 45.0) zoom = 45.0f;
 }
 
-void Camera::Move(CAM_MOVEMENT move, float deltaTime) {
+void CameraBase::Move(CAM_MOVEMENT move, float deltaTime) {
 	float offset = moveSpeed * deltaTime;
 	if (move == CAM_MOVEMENT::FORWARD) {
 		position += front * offset;
@@ -50,7 +50,7 @@ void Camera::Move(CAM_MOVEMENT move, float deltaTime) {
 	}
 }
 
-void Camera::Turn(float xOffset, float yOffset) {
+void CameraBase::Turn(float xOffset, float yOffset) {
 
 	xOffset *= sensitivity;
 	yOffset *= sensitivity;
@@ -68,7 +68,7 @@ void Camera::Turn(float xOffset, float yOffset) {
 	UpdateVectors();
 }
 
-void Camera::UpdateVectors() {
+void CameraBase::UpdateVectors() {
 	glm::vec3 front;
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(pitch));

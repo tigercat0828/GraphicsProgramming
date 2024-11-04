@@ -4,7 +4,7 @@
 #include "OGL/VAO.h"
 #include "OGL/VBO.h"
 #include "Shader.h"
-#include "PLYfile.h"
+#include "Modules/PLYfile.h"
 class PointCloud {
 public:
 	PointCloud(const Shader& shader,std::vector<glm::vec3>&& positions, std::vector<glm::vec3>&& normals, std::vector<glm::vec3>&& colors);

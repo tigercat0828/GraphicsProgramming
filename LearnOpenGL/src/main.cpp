@@ -1,21 +1,5 @@
 #include <iostream>
-#include <SDL2/SDL.h>
-#include <glad/glad.h>
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_sdl2.h>
-#include <imgui/imgui_impl_opengl3.h>
-#include <spdlog/spdlog.h>
-#include "Shader.h"
-#include "Application.h"
-#include "Debug.h"
-#include "OGL/VBO.h"
-#include "Texture.h"
-#include "Transform.h"
-#include "Camera.h"
-#include "Primitives/Cube.h"
-#include "Painter.h"
-#include "PLYfile.h"
-#include "Primitives/PointCloud.h"
+#include "AllInclude.h"
 using namespace std;
 using namespace glm;
 
@@ -26,7 +10,7 @@ static void OnMouseWheel(float wheelY);
 static void OnMouseMotion(float x, float y);
 static void OnMouseButtonDown(Uint8 button, int x, int y);
 
-Camera camera(glm::vec3(3, 3, 3 ), -30, -90);
+CameraBase camera(glm::vec3(3, 3, 3), -30, -90);
 int main(int argc, char** argv) {
 
 	APP->TEST("Launch!!");
@@ -43,8 +27,8 @@ int main(int argc, char** argv) {
 	else {
 		exit(-1);
 	}
-	
-		
+
+
 	// Laod Textures
 	Texture texture("wall.jpg");
 	// Compile Shaders
@@ -60,13 +44,13 @@ int main(int argc, char** argv) {
 	Painter painter(painterShader);
 	painter.SetLineWidth(3);
 	PointCloud cloud(pointCloudShader, ply);
-	
 
+	// TODO : tracked ball camera, L-system
 
 
 	int width, height;
 	APP->GetWindowSize(width, height);
-	
+
 	while (APP->IsRunning()) {
 		APP->Clear();
 		APP->ProcessInput();
@@ -81,14 +65,14 @@ int main(int argc, char** argv) {
 		mat4 projMat = mat4(1.0);
 		viewMat = camera.GetViewMatrix();
 		projMat = camera.GetProjMatrix(width, height);
-		
+
 		painter.SetMatMVP(modelMat, viewMat, projMat);
 		painter.Use();
 		painter.DrawAxis();
 		cloud.Render(modelMat, viewMat, projMat);
-		
-		
-	
+
+
+
 		APP->SwapFrameBuffer();
 	}
 
@@ -104,7 +88,7 @@ static void OnResize(int width, int height) {
 }
 static void OnKeyDown(SDL_Keycode keycode) {
 	//spdlog::info("Key {} pressed down", SDL_GetKeyName(keycode));
-	
+
 	if (keycode == SDLK_ESCAPE) {
 		spdlog::info("window close");
 		APP->Close();
@@ -149,11 +133,11 @@ static void OnMouseWheel(float wheelY) {
 	camera.Zoom(wheelY * 3.0f);
 }
 static void OnMouseButtonDown(Uint8 button, int x, int y) {
-	if (button == SDL_BUTTON_LEFT) 
+	if (button == SDL_BUTTON_LEFT)
 		spdlog::info("Left button click down ({}, {})", x, y);
-	else if (button == SDL_BUTTON_RIGHT) 
+	else if (button == SDL_BUTTON_RIGHT)
 		spdlog::info("right button click down ({}, {})", x, y);
-	
+
 }
 static void OnMouseMotion(float x, float y) {
 	CursorMode mode = APP->GetCursorMode();
