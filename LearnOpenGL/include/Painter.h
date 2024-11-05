@@ -6,20 +6,21 @@
 #include "Shader.h"
 class Painter {
 public:
-	Painter();
+	Painter(const Shader& shader);
 	/// <summary>
 	/// Draw the parallelogram expanded by the vectors AB, AC
 	/// </summary>
-	void DrawQuad(glm::vec3 a, glm::vec3 b, glm::vec3 c) ;
+	void DrawQuad(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) ;
 	void DrawAxis();
-	void DrawTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c) ;
-	void DrawLine(glm::vec3 a, glm::vec3 b) ;
-	void DrawPoint(glm::vec3 a);
+	void DrawTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) ;
+	void DrawLine(const glm::vec3& a, const glm::vec3& b);
+	void DrawPoint(const glm::vec3& a);
+	void DrawArrays(const std::vector<glm::vec3> buffer) {};
 	void Use();
-	void SetColor( const glm::vec3& color);
+	void SetColor(const glm::vec3& color);
 	void SetPointSize(float size);
 	void SetLineWidth(float width);
-	void SetMVPMat(glm::mat4 modelMat, glm::mat4 viewMat, glm::mat4 projMat);
+	void SetMatMVP(const glm::mat4& modelMat, const glm::mat4& viewMat, const glm::mat4& projMat);
 	void ReleaseGLResource();
 private:
 	glm::vec3 mColor{ Color::Orange };

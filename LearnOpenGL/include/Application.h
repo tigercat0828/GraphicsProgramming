@@ -39,6 +39,10 @@ public:
 	void Destroy();
 	void Clear();
 	void SwapFrameBuffer();
+public:
+	void NewImGuiFrame();
+
+public:
 	void LockCursor();
 	void UnLockCursor();
 public:

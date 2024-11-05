@@ -4,7 +4,8 @@
 #include <spdlog/spdlog.h>
 #include "Debug.h"
 #include "Texture.h"
-#include "stb_include.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 Texture::Texture(const char* file) {
 
 	std::filesystem::path filepath = std::filesystem::current_path() / "Assets" / "Textures" / file;
@@ -19,7 +20,7 @@ Texture::Texture(const char* file) {
 	// set texture filtering parameters
 	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
 	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-
+	// TODO : generate mipmap 
 	spdlog::info("Loading texture {}", file);
 	unsigned char* data = stbi_load(filepath.string().c_str(), &width, &height, &nrChannels, 0);
 	if (data) {

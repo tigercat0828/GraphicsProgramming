@@ -1,6 +1,9 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl2.h>
+#include <imgui/imgui_impl_opengl3.h>
 #include "Application.h"
 #include "Debug.h"
 Application* Application::mInstance = nullptr;
@@ -66,6 +69,18 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 		spdlog::info("Success to init GLAD");
 	}
 
+	// Setup ImGui context
+	//----------------------------------------------
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+
+	// Setup Platform/Renderer bindings
+	ImGui_ImplSDL2_InitForOpenGL(mWindow, mGLcontext);
+	ImGui_ImplOpenGL3_Init("#version 460");
+	//----------------------------------------------
+
 	if (mCursorMode == CURSOR_LOCKED) {
 		LockCursor();
 	}
@@ -87,14 +102,27 @@ void Application::Destroy() {
 
 void Application::Clear() {
 	// render
-	GL_CALL(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
+	GL_CALL(glClearColor(0,0,0, 1.0f));
 	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-	
 }
 
 void Application::SwapFrameBuffer() {
+
+	// Render ImGui
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	// swap buffer
 	SDL_GL_SwapWindow(mWindow);
 }
+
+void Application::NewImGuiFrame()
+{
+	// Start ImGui frame
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+}
+
 
 
 void Application::LockCursor() {
@@ -136,8 +164,10 @@ void Application::ProcessInput() {
 	SDL_Event event;
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 	while (SDL_PollEvent(&event)) {
+
+		ImGui_ImplSDL2_ProcessEvent(&event);
 		
-		// key down
+		
 		if (event.type == SDL_EventType::SDL_KEYDOWN) {
 			if (mKeyDownFunc != nullptr) {
 				//mKeyDownFunc(event.key.keysym.scancode);
@@ -186,7 +216,7 @@ void Application::ProcessInput() {
 			SDL_DestroyWindow(mWindow);
 			SDL_Quit();
 		}
-		//processMouseInput(event);
+
 	}
 	// smooth keyboard
 	if (mKeyPressedFunc != nullptr) {

@@ -1,9 +1,8 @@
 #include "Painter.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "Debug.h"
-Painter::Painter()
+Painter::Painter(const Shader& shader)
 {
-	Shader shader("xyzUrgb.vert", "xyzUrgb.frag");
 	mShader = shader;
 	mShader.Use();
 	SetColor(Color::White);
@@ -37,37 +36,38 @@ void Painter::DrawAxis()
 	SetColor(Color::Blue);
 	DrawLine(glm::vec3(0, 0, 0), glm::vec3(0, 0, 10));
 }
-void Painter::DrawTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
+void Painter::DrawTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c)
 {
 	mVertices[0] = a;
 	mVertices[1] = b;
 	mVertices[2] = c;
 	mVAO.Bind();
 	mVBO.Bind();
+
 	mVBO.SubData(0, 3 * sizeof(glm::vec3), mVertices);
-	GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 9));
+	GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
 	mVBO.Unbind();
 	mVAO.Unbind();
 }
-void Painter::DrawLine(glm::vec3 a, glm::vec3 b) 
+void Painter::DrawLine(const glm::vec3& a, const glm::vec3& b)
 {
 	// todo use sub data to update vertice data
 	mVertices[0] = a;
 	mVertices[1] = b;
 	mVAO.Bind();
 	mVBO.Bind();
-	mVBO.SubData(0,2*sizeof(glm::vec3),mVertices);
-	GL_CALL(glDrawArrays(GL_LINES, 0, 6));
+	mVBO.SubData(0, 2 * sizeof(glm::vec3), mVertices);
+	GL_CALL(glDrawArrays(GL_LINES, 0, 2));
 	mVBO.Unbind();
 	mVAO.Unbind();
 }
-void Painter::DrawPoint(glm::vec3 a)
+void Painter::DrawPoint(const glm::vec3& a)
 {
 	mVertices[0] = a;
 	mVAO.Bind();
 	mVBO.Bind();
 	mVBO.SubData(0, sizeof(glm::vec3), mVertices);
-	GL_CALL(glDrawArrays(GL_POINT, 0, 1));
+	GL_CALL(glDrawArrays(GL_POINTS, 0, 1));
 	mVBO.Unbind();
 	mVAO.Unbind();
 }
@@ -92,7 +92,7 @@ void Painter::SetLineWidth(float width)
 	GL_CALL(glLineWidth(width));
 }
 
-void Painter::SetMVPMat(glm::mat4 modelMat, glm::mat4 viewMat, glm::mat4 projMat)
+void Painter::SetMatMVP(const glm::mat4& modelMat, const glm::mat4& viewMat, const glm::mat4& projMat)
 {
 	mShader.Use();
 	mShader.SetMat4("uProjMat", projMat);

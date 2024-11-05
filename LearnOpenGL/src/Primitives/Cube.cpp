@@ -1,11 +1,12 @@
 #include "Primitives/Cube.h"
 #include "Debug.h"
 
+
 Cube::Cube(Transform transform) {
 	this->transform = transform;
 }
 
-void Cube::Render(const Shader& shader) const {
+void Cube::Render() const {
 	sVAO->Bind();
 	GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 36));
 	sVAO->Unbind();
