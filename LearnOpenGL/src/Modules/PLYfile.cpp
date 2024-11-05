@@ -53,3 +53,14 @@ bool PLYfile::LoadFile(const std::string& filename)
 	}
 	return true;
 }
+
+bool PLYfile::WriteTextFile(const std::string& filename)
+{
+	std::ofstream outFile(filename);
+	if (!outFile) {
+		spdlog::error("Failed to create file : {}", filename);
+		return false;
+	}
+
+	return true;
+}

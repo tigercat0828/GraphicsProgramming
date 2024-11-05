@@ -15,7 +15,6 @@ public:
 	void DrawTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) ;
 	void DrawLine(const glm::vec3& a, const glm::vec3& b);
 	void DrawPoint(const glm::vec3& a);
-	void DrawArrays(const std::vector<glm::vec3> buffer) {};
 	void Use();
 	void SetColor(const glm::vec3& color);
 	void SetPointSize(float size);

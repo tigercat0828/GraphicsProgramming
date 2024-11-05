@@ -19,6 +19,7 @@ public:
 	std::vector<glm::vec3> colors;
 	PLYfile() = default;
 	bool LoadFile(const std::string& filename);
+	bool WriteTextFile(const std::string& filename);
 };
 
 /*

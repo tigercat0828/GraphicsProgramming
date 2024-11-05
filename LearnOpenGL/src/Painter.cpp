@@ -15,7 +15,7 @@ Painter::Painter(const Shader& shader)
 	mVAO.Unbind();
 }
 
-void Painter::DrawQuad(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
+void Painter::DrawQuad(const glm::vec3& a,const glm::vec3& b,const glm::vec3& c) {
 	mVertices[0] = a;
 	mVertices[1] = b;
 	mVertices[2] = c;

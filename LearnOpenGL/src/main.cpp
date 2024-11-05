@@ -38,8 +38,8 @@ int main(int argc, char** argv) {
 	string plyfile = "input.ply";
 	PLYfile ply;
 	if (!ply.LoadFile(plyfile)) spdlog::error("failed to load .ply file {}", plyfile);
-
-	GL_CALL(glPointSize(1.0f));
+	
+	GL_CALL(glPointSize(2.0f));
 	// GameObjects
 	Painter painter(painterShader);
 	painter.SetLineWidth(3);
