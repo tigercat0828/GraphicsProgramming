@@ -11,7 +11,7 @@ uniform mat4 uProjMat;
 
 void main(){
 	
-	gl_Position =uProjMat * uViewMat * uModelMat* vec4(vPos.x,-vPos.y,vPos.z, 1.0f);
+	gl_Position = uProjMat * uViewMat * uModelMat* vec4(vPos.x,-vPos.y,vPos.z, 1.0f);
 	fColor = vColor;
 }
 

@@ -34,7 +34,6 @@ public:
 	bool IsRunning() const;
 	bool Init(const char* title, const int& width = 800, const int& height = 600);
 	void ProcessInput();
-	void Update();
 	void Close();
 	void Destroy();
 	void Clear();

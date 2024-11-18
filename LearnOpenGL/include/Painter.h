@@ -14,6 +14,7 @@ public:
 	void DrawAxis();
 	void DrawTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) ;
 	void DrawLine(const glm::vec3& a, const glm::vec3& b);
+	// void DrawRect();
 	void DrawPoint(const glm::vec3& a);
 	void Use();
 	void SetColor(const glm::vec3& color);

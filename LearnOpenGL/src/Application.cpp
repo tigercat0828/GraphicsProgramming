@@ -34,8 +34,8 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 	mHeight = height;
 
 	//spdlog::set_pattern("[%l] %v");
-
-	if (SDL_Init(SDL_INIT_VIDEO ) < 0) {
+	
+	if (SDL_Init(SDL_INIT_VIDEO ) < 0) {		// // SDL_INIT_EVERYTHING
 		spdlog::error("Fail to init SDL : {}", SDL_GetError());
 		return false;
 	}
@@ -75,7 +75,6 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
-
 	// Setup Platform/Renderer bindings
 	ImGui_ImplSDL2_InitForOpenGL(mWindow, mGLcontext);
 	ImGui_ImplOpenGL3_Init("#version 460");
@@ -90,9 +89,7 @@ bool Application::Init(const char* title, const int& width, const int& height) {
 	return true;
 }
 
-void Application::Update() {
-	
-}
+
 
 void Application::Destroy() {
 	SDL_GL_DeleteContext(mGLcontext);
