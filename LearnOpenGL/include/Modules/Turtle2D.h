@@ -38,15 +38,16 @@ public:
 		this->length = length;
 	}
 	void RotateRight(float angle) {
-		this.angle -= angle * (M_PI / 180.0);
+		this->angle -= angle * (M_PI / 180.0);
 	}
 	void RotateLeft(float angle) {
-		this.angle += angle * (M_PI / 180.0);
+		this->angle += angle * (M_PI / 180.0);
 	}
 
 	// set starting position
 	void MoveTo(float x, float y) {
-
+		this->x = x;
+		this->y = y;
 	}
 
 	void Step() {
