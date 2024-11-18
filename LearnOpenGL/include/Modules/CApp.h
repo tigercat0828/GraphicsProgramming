@@ -8,16 +8,16 @@ public:
         mIsRunning = true;
         mWindow = nullptr;
         mRenderer = nullptr;
-        reds.push_back(51); greens.push_back(128); blues.push_back(204);
-        reds.push_back(255); greens.push_back(128); blues.push_back(0);
-        reds.push_back(255); greens.push_back(191); blues.push_back(0);
+        reds.push_back(255); greens.push_back(0); blues.push_back(0);
+        reds.push_back(0); greens.push_back(255); blues.push_back(0);
+        reds.push_back(255); greens.push_back(170); blues.push_back(51);
     }
 
     bool OnInit() {
         if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
             return false;
         }
-        mWindow = SDL_CreateWindow("Turtle", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
+        mWindow = SDL_CreateWindow("Turtle", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, SDL_WINDOW_SHOWN);
         if (mWindow) {
             //mRenderer = SDL_CreateRenderer(mWindow, -1,  SDL_RENDERER_ACCELERATED);
             mRenderer = SDL_CreateRenderer(mWindow, -1,  0);
@@ -25,20 +25,20 @@ public:
         else {
             return false;
         }
-        mTurtle.MoveTo(400, 300);
+        mTurtle.MoveTo(325, 350);
         SDL_SetRenderDrawColor(mRenderer, 0,0,0,255);
         SDL_RenderClear(mRenderer);
         mTurtle.SetRenderer(mRenderer);
         mTurtle.PenDown();
         mTurtle.SetLength(75);
         mTurtle.Step();
-        for (int i = 0; i < 18; i++) {
+        for (int i = 0; i < 12; i++) {
             mTurtle.SetPenColor(reds[i%3], greens[i%3], blues[i%3],255);
             for (int j = 0; j < 8; j++) {
                 mTurtle.RotateRight(45);
                 mTurtle.Step();
             }
-            mTurtle.RotateLeft(20);
+            mTurtle.RotateLeft(30);
         }
         SDL_RenderPresent(mRenderer);
         return true;
