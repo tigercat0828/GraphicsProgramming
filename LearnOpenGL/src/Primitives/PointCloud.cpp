@@ -11,6 +11,15 @@ PointCloud::PointCloud(const Shader& shader, const PLYfile& ply) :mShader(shader
 	Initialize();
 }
 
+PointCloud::PointCloud(const Shader& shader,const std::vector<glm::vec3>& positions):mShader(shader), mPositions(positions) {
+	size_t count = mPositions.size();
+	mColors = std::vector<glm::vec3>(count,glm::vec3(255.0f,255.0f,255.0f));
+	mNormals = std::vector<glm::vec3>(count, glm::vec3(0, 0, 0));
+	Initialize();
+}
+
+
+
 void PointCloud::Initialize()
 {
 	mCount = mPositions.size();

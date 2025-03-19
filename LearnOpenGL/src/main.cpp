@@ -1,5 +1,7 @@
 #include <iostream>
 #include "AllInclude.h"
+#include "Vec3RW.h"
+#include "Primitives/Skeleton.h"
 using namespace std;
 using namespace glm;
 
@@ -27,13 +29,18 @@ int main(int argc, char** argv) {
 	else {
 		exit(-1);
 	}
-
-
 	// Laod Textures
 	Texture texture("wall.jpg");
 	// Compile Shaders
 	Shader painterShader("Painter.vert", "Painter.frag");
 	Shader pointCloudShader("PointCloud.vert", "PointCloud.frag");
+	Shader skeletonShader("skeleton.vert", "skeleton.frag");
+
+
+	auto edges = Vec3RW::Load("C:\\Users\\Tigercat\\Desktop\\skeleton.bin");
+	Skeleton skeleton(skeletonShader, edges);
+	//skeleton.PrintEdges();
+
 	// Load Files
 	string plyfile = "input.ply";
 	PLYfile ply;
@@ -43,7 +50,23 @@ int main(int argc, char** argv) {
 	// GameObjects
 	Painter painter(painterShader);
 	painter.SetLineWidth(3);
-	PointCloud cloud(pointCloudShader, ply);
+
+	
+	//PointCloud cloud(pointCloudShader, ply);
+	Vec3RW rw;
+	
+	//std::vector<glm::vec3> points = rw.Read("C:\\Repository\\AdTree\\data\\tree1.xyz");
+	std::vector<glm::vec3> points = rw.Read("C:\\Repository\\AdTree\\data\\tree7.xyz");
+
+	//std::vector<glm::vec3> points = rw.Read("C:\\Users\\Tigercat\\Downloads\\tree7_centralize.xyz");
+	//std::vector<glm::vec3> points = rw.Read("C:\\Users\\Tigercat\\Downloads\\tree1.xyz");
+	//Lille_2.xyz
+	//std::vector<glm::vec3> points = rw.Read("C:\\Users\\Tigercat\\Downloads\\Lille_2.xyz");
+	/*for (auto v : points) {
+		printf("%f %f %f\n",v.x,v.y,v.z);
+	}*/
+	PointCloud cloud(pointCloudShader,points);
+
 
 	// TODO : tracked ball camera, L-system
 
@@ -52,8 +75,8 @@ int main(int argc, char** argv) {
 	APP->GetWindowSize(width, height);
 
 	while (APP->IsRunning()) {
-		APP->Clear();
 		APP->ProcessInput();
+		APP->Clear();
 		APP->NewImGuiFrame();
 
 		ImGui::Begin("FPS Counter");
@@ -68,9 +91,9 @@ int main(int argc, char** argv) {
 
 		painter.SetMatMVP(modelMat, viewMat, projMat);
 		painter.Use();
-		painter.DrawAxis();
+		//painter.DrawAxis();
 		cloud.Render(modelMat, viewMat, projMat);
-
+		skeleton.Draw(modelMat, viewMat, projMat);
 
 
 		APP->SwapFrameBuffer();

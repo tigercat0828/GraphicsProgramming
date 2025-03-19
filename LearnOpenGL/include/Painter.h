@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "OGL/VAO.h"
 #include "OGL/VBO.h"
 #include "glm/glm.hpp"
@@ -14,8 +15,8 @@ public:
 	void DrawAxis();
 	void DrawTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) ;
 	void DrawLine(const glm::vec3& a, const glm::vec3& b);
-	// void DrawRect();
 	void DrawPoint(const glm::vec3& a);
+	// void DrawRect();
 	void Use();
 	void SetColor(const glm::vec3& color);
 	void SetPointSize(float size);

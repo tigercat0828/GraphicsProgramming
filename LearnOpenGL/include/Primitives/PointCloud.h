@@ -7,8 +7,9 @@
 #include "Modules/PLYfile.h"
 class PointCloud {
 public:
+	PointCloud(const Shader& shader, const std::vector<glm::vec3>& positions);
 	PointCloud(const Shader& shader,std::vector<glm::vec3>&& positions, std::vector<glm::vec3>&& normals, std::vector<glm::vec3>&& colors);
-	PointCloud(const Shader& shader,const PLYfile& ply);
+	PointCloud(const Shader& shader, const PLYfile& ply);
 private:
 	void Initialize();
 public:

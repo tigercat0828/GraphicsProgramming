@@ -28,8 +28,6 @@ void Application::TEST(const char* text) {
 }
 
 bool Application::Init(const char* title, const int& width, const int& height) {
-
-
 	mWidth = width;
 	mHeight = height;
 
